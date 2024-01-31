@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!-- Coding By CodingNepal - youtube.com/codingnepal -->
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>Image Gallery with JavaScript | CodingNepal</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+
+
+  <section id="uploadSection" class="search">
+    <img src="./images/search-img.jpg" alt="search-img">
+    <div class="content">
+
+      
+        <div class="profile-pic-wrapper">
+          <div class="pic-holder">
+            <h1>Image Gallery with JavaScript</h1>
+            <p>Search and download any images within a second</p>
+            <!-- uploaded pic shown here -->
+            <form id="uploadForm" enctype="multipart/form-data">
+            <img id="profilePic" class="pic" src="https://source.unsplash.com/random/150x150?person">
+
+            <Input class="uploadProfileInput" type="file" name="profile_pic" id="newProfilePhoto" accept="image/*"
+              style="opacity: 0;" />
+            <label for="newProfilePhoto" class="upload-file-block">
+              <div class="text-center">
+                <div class="mb-2">
+                  <i class="fa fa-camera fa-2x"></i>
+                </div>
+                <div class="text-uppercase">
+                  Update <br /> Profile Photo
+                </div>
+              </div>
+            </label>
+          </form>
+          </div>
+
+         
+          
+        </div>
+    </div>
+
+
+  </section>
+  <section class="gallery">
+    <div id="resultSection">
+
+    <div id="recommendedImages" class="recommendedImages"></div>
+    <!-- <button class="load-more">Load More</button> -->
+  </div>
+  </section>
+
+</body>
+<script>
+  const uploadSection = document.getElementById('uploadSection');
+  const resultSection = document.getElementById('resultSection');
+  
+
+  uploadSection.addEventListener('mouseenter', function () {
+    this.style.transform = 'translateY(-5px)';
+    this.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)';
+  });
+
+  uploadSection.addEventListener('mouseleave', function () {
+    this.style.transform = 'translateY(0)';
+    this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+  });
+
+const fileInput = document.getElementById('newProfilePhoto');
+fileInput.addEventListener('change', handleFileChange);
+function handleFileChange() {
+// Call your uploadImage logic here or any other logic you want on file change
+  uploadImage();
+}
+  function uploadImage() {
+    const fileInput = document.getElementById('newProfilePhoto');
+    const file = fileInput.files[0];
+
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Use AJAX to send the image data to the server
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/upload', true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          const data = JSON.parse(xhr.responseText);
+          displayResult(data);
+        } else {
+          console.error('Error:', xhr.statusText);
+        }
+      };
+      xhr.onerror = function () {
+        console.error('Request failed');
+      };
+      xhr.send(formData);
+    }
+  }
+
+  function resizeImage(base64, width, height) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = base64;
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg'));
+      };
+      img.onerror = function (error) {
+        reject(error);
+      };
+    });
+  }
+
+  async function displayResult(data) {
+   
+
+    // Show result section
+    resultSection.style.display = 'block';
+
+    // Set result image source
+    const resultImage = document.getElementById('resultImage');
+    resultImage.src = await resizeImage(`data:image/jpeg;base64,${data.uploadedImageBase64}`, 400, 400);
+
+    // Display recommended images
+    const recommendedImages = document.getElementById('recommendedImages');
+    recommendedImages.innerHTML = '';
+    for (const imageBase64 of data.recommendedImagesBase64) {
+      try {
+        const resizedImage = await resizeImage(`data:image/jpeg;base64,${imageBase64}`, 200, 200);
+        const recommendedImage = document.createElement('img');
+        recommendedImage.src = resizedImage;
+        recommendedImage.classList.add('recommendedImage');
+        recommendedImages.appendChild(recommendedImage);
+      } catch (error) {
+        console.error('Error resizing image:', error);
+      }
+    }
+
+    // Display uploaded image
+    uploadedImage.src = await resizeImage(`data:image/jpeg;base64,${data.uploadedImageBase64}`, 200, 200);
+    uploadedImage.style.display = 'block';
+  }
+
+ 
+</script>
+
+</html>

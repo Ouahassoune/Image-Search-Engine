@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Image Upload Example</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/boxicons/2.0.7/css/boxicons.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #uploadSection, #resultSection {
+            text-align: center;
+            animation: fadeInUp 1s ease-in-out;
+        }
+        #uploadSection {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #uploadSection:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        #resultSection {
+            display: none;
+            margin-top: 20px;
+        }
+        #resultImage {
+            max-width: 100%;
+            max-height: 400px;
+            margin-top: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+            animation: fadeInUp 1s ease-in-out;
+        }
+        #resultImage:hover {
+            transform: scale(1.1);
+        }
+        #recommendedImages {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .recommendedImage {
+            margin: 0 10px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+            animation: fadeInUp 1s ease-in-out;
+        }
+        .recommendedImage:hover {
+            transform: scale(1.1);
+        }
+        .uploadIcon {
+            font-size: 36px;
+            color: #3498db;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Integrated Styles */
+        #uploadSection label {
+            display: block;
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 18px;
+        }
+        #uploadSection input[type="file"] {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 16px;
+        }
+        #uploadSection button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+        #uploadSection button:hover {
+            background-color: #45a049;
+        }
+        #uploadedImage {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #returnButton {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="uploadSection">
+        <h2 style="color: #333; font-size: 24px; margin-bottom: 15px;">Upload Image</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="fileInput">Choose an image:</label>
+            <input type="file" id="fileInput" accept="image/*">
+            <button type="button" onclick="uploadImage()" class="btn btn-success">Upload <i class='bx bxs-cloud-upload icon uploadIcon'></i></button>
+        </form>
+        <img id="uploadedImage" alt="Uploaded Image" style="display: none;">
+    </div>
+
+    <div id="resultSection">
+        <h2>Result</h2>
+        <img id="resultImage" alt="Result Image">
+        <div id="recommendedImages" class="recommendedImages"></div>
+        <button id="returnButton" onclick="returnToUpload()" class="btn btn-primary">Return to Upload</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const uploadSection = document.getElementById('uploadSection');
+        const resultSection = document.getElementById('resultSection');
+        const uploadedImage = document.getElementById('uploadedImage');
+
+        uploadSection.addEventListener('mouseenter', function () {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)';
+        });
+
+        uploadSection.addEventListener('mouseleave', function () {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+        });
+
+        function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Use AJAX to send the image data to the server
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/upload', true);
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        const data = JSON.parse(xhr.responseText);
+                        displayResult(data);
+                    } else {
+                        console.error('Error:', xhr.statusText);
+                    }
+                };
+                xhr.onerror = function () {
+                    console.error('Request failed');
+                };
+                xhr.send(formData);
+            }
+        }
+
+        function resizeImage(base64, width, height) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = base64;
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg'));
+                };
+                img.onerror = function (error) {
+                    reject(error);
+                };
+            });
+        }
+
+        async function displayResult(data) {
+            // Hide upload section
+            uploadSection.style.display = 'none';
+
+            // Show result section
+            resultSection.style.display = 'block';
+
+            // Set result image source
+            const resultImage = document.getElementById('resultImage');
+            resultImage.src = await resizeImage(`data:image/jpeg;base64,${data.uploadedImageBase64}`, 400, 400);
+
+            // Display recommended images
+            const recommendedImages = document.getElementById('recommendedImages');
+            recommendedImages.innerHTML = '';
+            for (const imageBase64 of data.recommendedImagesBase64) {
+                try {
+                    const resizedImage = await resizeImage(`data:image/jpeg;base64,${imageBase64}`, 200, 200);
+                    const recommendedImage = document.createElement('img');
+                    recommendedImage.src = resizedImage;
+                    recommendedImage.classList.add('recommendedImage');
+                    recommendedImages.appendChild(recommendedImage);
+                } catch (error) {
+                    console.error('Error resizing image:', error);
+                }
+            }
+
+            // Display uploaded image
+            uploadedImage.src = await resizeImage(`data:image/jpeg;base64,${data.uploadedImageBase64}`, 200, 200);
+            uploadedImage.style.display = 'block';
+        }
+
+        function returnToUpload() {
+            // Show upload section
+            uploadSection.style.display = 'block';
+
+            // Hide result section
+            resultSection.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

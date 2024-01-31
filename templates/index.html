@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+<style>
+
+        body{
+    background-color: #eaeaea;
+    overflow: hidden;
+}
+.container{
+    position: absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+    width:1000px;
+    height:600px;
+    padding:50px;
+    background-color: #f5f5f5;
+    box-shadow: 0 30px 50px #dbdbdb;
+}
+#slide{
+    width:max-content;
+    margin-top:50px;
+}
+.item{
+    width:200px;
+    height:300px;
+    background-position: 50% 50%;
+    display: inline-block;
+    transition: 0.5s;
+    background-size: cover;
+    position: absolute;
+    z-index: 1;
+    top:50%;
+    transform: translate(0,-50%);
+    border-radius: 20px;
+    box-shadow:  0 30px 50px #505050;
+}
+.item:nth-child(1),
+.item:nth-child(2){
+    left:0;
+    top:0;
+    transform: translate(0,0);
+    border-radius: 0;
+    width:100%;
+    height:100%;
+    box-shadow: none;
+}
+.item:nth-child(3){
+    left:50%;
+}
+.item:nth-child(4){
+    left:calc(50% + 220px);
+}
+.item:nth-child(5){
+    left:calc(50% + 440px);
+}
+.item:nth-child(n+6){
+    left:calc(50% + 660px);
+    opacity: 0;
+}
+.item .content{
+    position: absolute;
+    top:50%;
+    left:100px;
+    width:300px;
+    text-align: left;
+    padding:0;
+    color:#eee;
+    transform: translate(0,-50%);
+    display: none;
+    font-family: system-ui;
+}
+.item:nth-child(2) .content{
+    display: block;
+    z-index: 11111;
+}
+.item .name{
+    font-size: 40px;
+    font-weight: bold;
+    opacity: 0;
+    animation:showcontent 1s ease-in-out 1 forwards
+}
+.item .des{
+    margin:20px 0;
+    opacity: 0;
+    animation:showcontent 1s ease-in-out 0.3s 1 forwards
+}
+.item button{
+    padding:10px 20px;
+    border:none;
+    opacity: 0;
+    animation:showcontent 1s ease-in-out 0.6s 1 forwards
+}
+@keyframes showcontent{
+    from{
+        opacity: 0;
+        transform: translate(0,100px);
+        filter:blur(33px);
+    }to{
+        opacity: 1;
+        transform: translate(0,0);
+        filter:blur(0);
+    }
+}
+.buttons{
+    position: absolute;
+    bottom:30px;
+    z-index: 222222;
+    text-align: center;
+    width:100%;
+}
+.buttons button{
+    width:50px;
+    height:50px;
+    border-radius: 50%;
+    border:1px solid #555;
+    transition: 0.5s;
+}.buttons button:hover{
+    background-color: #bac383;
+}
+#recommendedImagesSlider {
+            width: max-content;
+            margin-top: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        .recommendedItem {
+            width: 200px;
+            height: 300px;
+            background-position: 50% 50%;
+            display: inline-block;
+            transition: 0.5s;
+            background-size: cover;
+            position: absolute;
+            z-index: 1;
+            top: 50%;
+            transform: translate(0, -50%);
+            border-radius: 20px;
+            box-shadow: 0 30px 50px #505050;
+        }
+        .search {
+  height: 40vh;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+}
+.search::before, .search img, .lightbox {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+.search::before {
+  content: "";
+  z-index: 1;
+  background: rgba(0,0,0,0.25);
+}
+.search img {
+  object-fit: cover;
+}
+.search .content {
+  z-index: 2;
+  color: #fff;
+  padding: 0 13px;
+  text-align: center;
+  position: relative;
+}
+.search h1 {
+  font-size: 2.65rem;
+  font-weight: 600;
+}
+.search p {
+  margin-top: 8px;
+  font-size: 1.5rem;
+}
+.search .search-box {
+  height: 55px;
+  margin: 45px 0;
+  position: relative;
+}
+.search-box i {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  cursor: default;
+  color: #8D8D8D;
+  font-size: 1.4rem;
+  transform: translateY(-50%);
+}
+.search-box input {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  border: none;
+  font-size: 1.1rem;
+  padding-left: 55px;
+  background: #fff;
+  border-radius: 5px;
+}
+.search-box input::placeholder {
+  color: #929292;
+}
+.search-box input:focus::placeholder {
+  color: #bfbfbf;
+}
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div id="uploadSection">
+            <h2 style="color: #333; font-size: 24px; margin-bottom: 15px;">Upload Image</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <label for="fileInput">Choose an image:</label>
+                <input type="file" id="fileInput" accept="image/*">
+                <button type="button" onclick="uploadImage()" class="btn btn-success">Upload <i class='bx bxs-cloud-upload icon uploadIcon'></i></button>
+            </form>
+            <img id="uploadedImage" alt="Uploaded Image" style="display: none;">
+        </div>
+        <div id="slide">
+            <!-- <div class="item" style="background-image: url(1.jpg);">
+                <div class="content">
+                    <div class="name">LUNDEV</div>
+                    <div class="des">Tinh ru anh di chay pho, chua kip chay pho thi anhchay mat tieu</div>
+                    <button>See more</button>
+                </div>
+            </div> -->
+            <div id="recommendedImagesSlider">
+                <!-- Recommended image items will be appended here -->
+            </div>
+           
+          
+        </div>
+        <div class="buttons">
+            <button id="prev"><i class="fa-solid fa-angle-left"></i></button>
+            <button id="next"><i class="fa-solid fa-angle-right"></i></button>
+        </div>
+    </div>
+
+</body>
+
+<script>
+document.getElementById('next').onclick = function(){
+    let lists = document.querySelectorAll('.item');
+    document.getElementById('slide').appendChild(lists[0]);
+}
+document.getElementById('prev').onclick = function(){
+    let lists = document.querySelectorAll('.item');
+    document.getElementById('slide').prepend(lists[lists.length - 1]);
+}
+
+function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Use AJAX to send the image data to the server
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/upload', true);
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        const data = JSON.parse(xhr.responseText);
+                        displayResult(data);
+                    } else {
+                        console.error('Error:', xhr.statusText);
+                    }
+                };
+                xhr.onerror = function () {
+                    console.error('Request failed');
+                };
+                xhr.send(formData);
+            }
+        }
+
+        function resizeImage(base64, width, height) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = base64;
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg'));
+                };
+                img.onerror = function (error) {
+                    reject(error);
+                };
+            });
+        }
+
+        async function displayResult(data) {
+            // Hide upload section
+            uploadSection.style.display = 'none';
+
+            // Show result section
+            resultSection.style.display = 'block';
+
+            // Set result image source
+            const resultImage = document.getElementById('resultImage');
+            resultImage.src = await resizeImage(`data:image/jpeg;base64,${data.uploadedImageBase64}`, 400, 400);
+
+            // Display recommended images
+            const recommendedImages = document.getElementById('recommendedImages');
+            recommendedImages.innerHTML = '';
+            for (const imageBase64 of data.recommendedImagesBase64) {
+                try {
+                    const resizedImage = await resizeImage(`data:image/jpeg;base64,${imageBase64}`, 200, 200);
+                    const recommendedImage = document.createElement('img');
+                    recommendedImage.src = resizedImage;
+                    recommendedImage.classList.add('recommendedImage');
+                    recommendedImages.appendChild(recommendedImage);
+                } catch (error) {
+                    console.error('Error resizing image:', error);
+                }
+            }
+
+            // Display uploaded image
+            uploadedImage.src = await resizeImage(`data:image/jpeg;base64,${data.uploadedImageBase64}`, 200, 200);
+            uploadedImage.style.display = 'block';
+        }
+
+</script>
+
+</html>

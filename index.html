@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload Example</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    #uploadSection {
+        text-align: center;
+    }
+    #resultSection {
+        display: none;
+        margin-top: 20px;
+        text-align: center;
+    }
+    #resultImage {
+        max-width: 100%;
+        max-height: 400px;
+        margin-top: 10px;
+    }
+</style>
+<body>
+    <div id="uploadSection">
+        <h2>Upload Image</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" id="fileInput" accept="image/*">
+            <button type="button" onclick="uploadImage()">Upload</button>
+        </form>
+    </div>
+
+    <div id="resultSection">
+        <h2>Result</h2>
+        <img id="resultImage" alt="Result Image">
+    </div>
+
+    <script>
+        function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayResult(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        function displayResult(data) {
+            const uploadSection = document.getElementById('uploadSection');
+            const resultSection = document.getElementById('resultSection');
+            const resultImage = document.getElementById('resultImage');
+
+            // Hide upload section
+            uploadSection.style.display = 'none';
+
+            // Show result section
+            resultSection.style.display = 'block';
+
+            // Set result image source
+            resultImage.src = data.resultImageUrl;
+        }
+    </script>
+</body>
+</html>
